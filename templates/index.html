@@ -25,7 +25,7 @@
 
     <!-- Header Section -->
     <header class="max-w-7xl w-full mx-auto mb-6">
-        <h1 class="text-2xl font-bold tracking-tight text-white">Pemantau Kantuk & Distraksi</h1>
+        <h1 class="text-2xl font-bold tracking-tight text-white">Pemantau Kantuk &amp; Distraksi</h1>
         <p class="text-xs text-slate-400 mt-1">Analisis wajah lokal real-time — fitur Hybrid 4D (EAR, MAR, Pitch, Yaw) + Random Forest</p>
     </header>
 
@@ -65,15 +65,12 @@
                 <p id="statusSub" class="text-xs font-medium text-slate-300 mt-1">Pengemudi fokus penuh pada jalan raya</p>
             </div>
 
-            <!-- Tombol Aksi Kontrol -->
+            <!-- Tombol Aksi Kontrol (Dua Tombol) -->
             <div class="flex flex-col gap-2.5">
-                <button onclick="calibratedAlert()" class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition-all shadow-md active:scale-[0.98]">
-                    Kalibrasi (10 detik)
-                </button>
-                <button onclick="startMonitoring()" class="w-full py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm border border-slate-700 transition-all">
+                <button onclick="startMonitoring()" class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition-all shadow-md active:scale-[0.98]">
                     Mulai Pemantauan
                 </button>
-                <button onclick="stopMonitoring()" class="w-full py-3 px-4 rounded-xl bg-rose-600/90 hover:bg-rose-500 text-white font-semibold text-sm transition-all shadow-md">
+                <button onclick="stopMonitoring()" class="w-full py-3.5 px-4 rounded-xl bg-rose-600/90 hover:bg-rose-500 text-white font-semibold text-sm transition-all shadow-md">
                     Hentikan
                 </button>
             </div>
@@ -195,10 +192,6 @@
                 .catch(err => console.error(err));
         }, 300);
 
-        // Dummy Handler Tombol Kontrol
-        function calibratedAlert() {
-            alert("Memulai Kalibrasi Wajah 10 Detik...");
-        }
         function startMonitoring() {
             console.log("Monitoring Diaktifkan");
         }
