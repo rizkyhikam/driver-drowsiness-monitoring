@@ -7,7 +7,7 @@ import urllib.request
 import os
 import threading
 
-from flask import Flask, render_template, Response, jsonify
+from flask import Flask, render_template, Response, jsonify, request
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
@@ -555,9 +555,23 @@ def generate_frames():
 # =====================================================
 
 @app.route('/')
-def index():
+def home():
+    return render_template('home.html')
 
-    return render_template('index.html')
+
+@app.route('/monitoring')
+def monitoring():
+    return render_template('monitoring.html')
+
+
+@app.route('/history')
+def history():
+    return render_template('history.html')
+
+
+@app.route('/guide')
+def guide():
+    return render_template('guide.html')
 
 
 @app.route('/video_feed')
@@ -573,6 +587,130 @@ def video_feed():
 def get_telemetry():
 
     return jsonify(telemetry_data)
+
+
+# =====================================================
+# HISTORY API — ambil log dari Supabase
+# =====================================================
+
+@app.route('/get_history')
+def get_history():
+    """
+    Query parameter yang didukung:
+      ?page=1          → nomor halaman (default 1, 50 baris per halaman)
+      ?status=DROWSY   → filter kolom status (opsional)
+      ?date_from=YYYY-MM-DD  → filter tanggal mulai (opsional)
+      ?date_to=YYYY-MM-DD    → filter tanggal akhir (opsional)
+    """
+
+    if supabase is None:
+        return jsonify({
+            "error": "Database tidak terhubung. Periksa konfigurasi Supabase.",
+            "data": [],
+            "total": 0
+        }), 503
+
+    try:
+
+        PAGE_SIZE = 50
+
+        page       = max(int(request.args.get('page', 1)), 1)
+        status_filter  = request.args.get('status', '').strip().upper()
+        date_from  = request.args.get('date_from', '').strip()
+        date_to    = request.args.get('date_to', '').strip()
+
+        offset = (page - 1) * PAGE_SIZE
+
+        # --- hitung total (untuk pagination) ---
+        count_query = supabase.table('drowsiness_logs').select(
+            '*', count='exact'
+        )
+
+        if status_filter:
+            count_query = count_query.eq('status', status_filter)
+
+        if date_from:
+            count_query = count_query.gte('created_at', date_from + 'T00:00:00')
+
+        if date_to:
+            count_query = count_query.lte('created_at', date_to + 'T23:59:59')
+
+        count_result = count_query.execute()
+        total = count_result.count if count_result.count is not None else 0
+
+        # --- ambil data halaman ini ---
+        data_query = supabase.table('drowsiness_logs').select(
+            'id, created_at, status, ear, mar, pitch, yaw'
+        ).order('created_at', desc=True).range(offset, offset + PAGE_SIZE - 1)
+
+        if status_filter:
+            data_query = data_query.eq('status', status_filter)
+
+        if date_from:
+            data_query = data_query.gte('created_at', date_from + 'T00:00:00')
+
+        if date_to:
+            data_query = data_query.lte('created_at', date_to + 'T23:59:59')
+
+        result = data_query.execute()
+
+        return jsonify({
+            "data":      result.data,
+            "total":     total,
+            "page":      page,
+            "page_size": PAGE_SIZE,
+            "pages":     max(1, -(-total // PAGE_SIZE))   # ceil division
+        })
+
+    except Exception as err:
+        print(f"[HISTORY ERROR] {err}")
+        return jsonify({
+            "error": str(err),
+            "data": [],
+            "total": 0
+        }), 500
+
+
+# =====================================================
+# HISTORY STATS API — ringkasan per-status
+# =====================================================
+
+@app.route('/get_history_stats')
+def get_history_stats():
+
+    if supabase is None:
+        return jsonify({"error": "Database tidak terhubung."}), 503
+
+    try:
+
+        result = supabase.table('drowsiness_logs').select(
+            'status', count='exact'
+        ).execute()
+
+        # hitung per-status
+        counts = {"ALERT": 0, "DROWSY": 0, "DISTRACTED": 0, "NO FACE": 0}
+        total  = 0
+
+        all_rows = supabase.table('drowsiness_logs').select(
+            'status'
+        ).execute()
+
+        for row in (all_rows.data or []):
+            s = row.get('status', '')
+            counts[s] = counts.get(s, 0) + 1
+            total += 1
+
+        return jsonify({
+            "total":      total,
+            "alert":      counts.get('ALERT', 0),
+            "drowsy":     counts.get('DROWSY', 0),
+            "distracted": counts.get('DISTRACTED', 0),
+            "no_face":    counts.get('NO FACE', 0),
+        })
+
+    except Exception as err:
+        print(f"[STATS ERROR] {err}")
+        return jsonify({"error": str(err)}), 500
 
 
 # =====================================================

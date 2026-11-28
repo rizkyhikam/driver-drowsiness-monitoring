@@ -1,0 +1,582 @@
+{% extends "base.html" %}
+{% set active_page = "history" %}
+
+{% block title %}Riwayat Monitoring — DrowsiGuard{% endblock %}
+
+{% block content %}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
+        <div>
+            <h1 class="text-xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="clock" class="w-5 h-5 text-blue-400"></i>
+                Riwayat Monitoring
+            </h1>
+            <p class="text-xs text-slate-400 mt-0.5">Log sesi pemantauan kantuk dan distraksi dari database</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <!-- DB status badge -->
+            <div id="dbStatusBadge"
+                 class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-medium text-slate-400">
+                <span class="w-2 h-2 rounded-full bg-slate-500 animate-pulse"></span>
+                Memeriksa koneksi…
+            </div>
+
+            <!-- Refresh button -->
+            <button id="refreshBtn"
+                    onclick="loadHistory(currentPage)"
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors border border-slate-700 active:scale-95">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="refreshIcon"></i>
+                Perbarui
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ============================================ -->
+    <!-- STATS SUMMARY CARDS                          -->
+    <!-- ============================================ -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+            <div class="flex items-center gap-2 mb-2">
+                <i data-lucide="list" class="w-3.5 h-3.5 text-slate-400"></i>
+                <span class="text-[11px] text-slate-500 font-medium">Total Catatan</span>
+            </div>
+            <p id="statTotal" class="text-2xl font-bold text-white">—</p>
+        </div>
+
+        <div class="bg-slate-900/80 border border-rose-800/40 rounded-xl p-4">
+            <div class="flex items-center gap-2 mb-2">
+                <i data-lucide="eye-off" class="w-3.5 h-3.5 text-rose-400"></i>
+                <span class="text-[11px] text-rose-400/70 font-medium">Kantuk</span>
+            </div>
+            <p id="statDrowsy" class="text-2xl font-bold text-rose-400">—</p>
+        </div>
+
+        <div class="bg-slate-900/80 border border-amber-800/40 rounded-xl p-4">
+            <div class="flex items-center gap-2 mb-2">
+                <i data-lucide="scan-face" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span class="text-[11px] text-amber-400/70 font-medium">Distraksi</span>
+            </div>
+            <p id="statDistracted" class="text-2xl font-bold text-amber-400">—</p>
+        </div>
+
+        <div class="bg-slate-900/80 border border-emerald-800/40 rounded-xl p-4">
+            <div class="flex items-center gap-2 mb-2">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span class="text-[11px] text-emerald-400/70 font-medium">Alert (Fokus)</span>
+            </div>
+            <p id="statAlert" class="text-2xl font-bold text-emerald-400">—</p>
+        </div>
+
+    </div>
+
+
+    <!-- ============================================ -->
+    <!-- FILTER BAR                                   -->
+    <!-- ============================================ -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 mb-5">
+        <div class="flex flex-col sm:flex-row gap-3 items-end">
+
+            <!-- Date range -->
+            <div class="flex items-center gap-2 flex-1">
+                <label class="text-xs text-slate-400 font-medium whitespace-nowrap flex items-center gap-1.5">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                    Tanggal:
+                </label>
+                <input type="date" id="filterDateFrom"
+                       class="flex-1 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 text-xs focus:outline-none focus:border-blue-500 transition-colors min-w-0">
+                <span class="text-slate-500 text-xs flex-shrink-0">—</span>
+                <input type="date" id="filterDateTo"
+                       class="flex-1 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 text-xs focus:outline-none focus:border-blue-500 transition-colors min-w-0">
+            </div>
+
+            <!-- Status filter -->
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <label class="text-xs text-slate-400 font-medium whitespace-nowrap flex items-center gap-1.5">
+                    <i data-lucide="filter" class="w-3.5 h-3.5"></i>
+                    Status:
+                </label>
+                <select id="filterStatus"
+                        class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 text-xs focus:outline-none focus:border-blue-500 transition-colors">
+                    <option value="">Semua Status</option>
+                    <option value="ALERT">ALERT</option>
+                    <option value="DROWSY">KANTUK (DROWSY)</option>
+                    <option value="DISTRACTED">DISTRACTED</option>
+                    <option value="NO FACE">NO FACE</option>
+                </select>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-2 flex-shrink-0">
+                <button onclick="applyFilter()"
+                        class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 active:scale-95">
+                    <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                    Terapkan
+                </button>
+                <button onclick="resetFilter()"
+                        class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs font-medium transition-colors border border-slate-700 active:scale-95">
+                    Reset
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ============================================ -->
+    <!-- DATA TABLE                                   -->
+    <!-- ============================================ -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden">
+
+        <!-- Table header -->
+        <div class="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                <i data-lucide="table" class="w-4 h-4 text-blue-400"></i>
+                Log Telemetri
+            </h2>
+            <div class="flex items-center gap-2">
+                <span id="recordCount" class="text-[11px] text-slate-500 px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700">
+                    Memuat…
+                </span>
+                <!-- Export hint -->
+                <span class="hidden sm:block text-[10px] text-slate-600">↑ terbaru di atas</span>
+            </div>
+        </div>
+
+        <!-- Responsive table -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="border-b border-slate-800/60 bg-slate-900/50">
+                        <th class="text-left px-5 py-3 text-slate-500 font-semibold">
+                            <div class="flex items-center gap-1.5">
+                                <i data-lucide="clock" class="w-3 h-3"></i>
+                                Waktu
+                            </div>
+                        </th>
+                        <th class="text-left px-4 py-3 text-slate-500 font-semibold">
+                            <div class="flex items-center gap-1.5">
+                                <i data-lucide="activity" class="w-3 h-3"></i>
+                                Status
+                            </div>
+                        </th>
+                        <th class="text-right px-4 py-3 text-slate-500 font-semibold">
+                            <div class="flex items-center justify-end gap-1">
+                                <i data-lucide="eye" class="w-3 h-3"></i>
+                                EAR
+                            </div>
+                        </th>
+                        <th class="text-right px-4 py-3 text-slate-500 font-semibold">
+                            <div class="flex items-center justify-end gap-1">
+                                <i data-lucide="smile" class="w-3 h-3"></i>
+                                MAR
+                            </div>
+                        </th>
+                        <th class="text-right px-4 py-3 text-slate-500 font-semibold">
+                            <div class="flex items-center justify-end gap-1">
+                                <i data-lucide="arrow-up-down" class="w-3 h-3"></i>
+                                Pitch
+                            </div>
+                        </th>
+                        <th class="text-right px-5 py-3 text-slate-500 font-semibold">
+                            <div class="flex items-center justify-end gap-1">
+                                <i data-lucide="arrow-left-right" class="w-3 h-3"></i>
+                                Yaw
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <!-- Rows injected by JS -->
+                    <tr id="loadingRow">
+                        <td colspan="6" class="text-center py-16">
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                <p class="text-sm text-slate-500">Memuat data riwayat…</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="px-5 py-3.5 border-t border-slate-800/60 flex items-center justify-between gap-3">
+            <span id="paginationInfo" class="text-[11px] text-slate-600">—</span>
+            <div class="flex items-center gap-1.5" id="paginationBtns">
+                <!-- injected by JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- DB Error notice (shown if db offline) -->
+    <div id="dbErrorNotice" class="hidden mt-5 flex items-start gap-3 p-4 rounded-xl bg-rose-600/8 border border-rose-500/20">
+        <i data-lucide="wifi-off" class="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5"></i>
+        <div>
+            <p class="text-xs font-semibold text-rose-300 mb-1">Koneksi Database Gagal</p>
+            <p id="dbErrorMsg" class="text-[11px] text-slate-500 leading-relaxed">
+                Tidak dapat terhubung ke Supabase. Pastikan <code class="text-blue-400">SUPABASE_URL</code>
+                dan <code class="text-blue-400">SUPABASE_KEY</code> sudah benar dan server Flask berjalan.
+            </p>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+
+    // ============================================================
+    // STATE
+    // ============================================================
+
+    let currentPage      = 1;
+    let currentStatus    = '';
+    let currentDateFrom  = '';
+    let currentDateTo    = '';
+    let isLoading        = false;
+
+    // ============================================================
+    // STATUS BADGE CONFIG
+    // ============================================================
+
+    const STATUS_CFG = {
+        ALERT:      { label: 'ALERT',      cls: 'bg-emerald-600/15 text-emerald-400 border border-emerald-500/30' },
+        DROWSY:     { label: 'KANTUK',     cls: 'bg-rose-600/15 text-rose-400 border border-rose-500/30' },
+        DISTRACTED: { label: 'DISTRACTED', cls: 'bg-amber-600/15 text-amber-400 border border-amber-500/30' },
+        'NO FACE':  { label: 'NO FACE',    cls: 'bg-slate-700/60 text-slate-400 border border-slate-600/50' },
+    };
+
+    function statusBadge(status) {
+        const cfg = STATUS_CFG[status] || { label: status, cls: 'bg-slate-700 text-slate-400' };
+        return `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black tracking-wide ${cfg.cls}">${cfg.label}</span>`;
+    }
+
+    function earColor(ear) {
+        if (!ear) return 'text-slate-400';
+        return ear <= 0.22 ? 'text-rose-400 font-bold' : 'text-slate-200';
+    }
+
+    function marColor(mar) {
+        if (!mar) return 'text-slate-400';
+        return mar >= 0.35 ? 'text-rose-400 font-bold' : 'text-slate-200';
+    }
+
+    function headPoseColor(val) {
+        if (!val && val !== 0) return 'text-slate-400';
+        return Math.abs(val) > 15 ? 'text-amber-400 font-bold' : 'text-slate-200';
+    }
+
+    // ============================================================
+    // FORMAT TIMESTAMP (Asia/Jakarta)
+    // ============================================================
+
+    function formatTimestamp(isoStr) {
+        if (!isoStr) return '—';
+        try {
+            const d = new Date(isoStr);
+            return d.toLocaleString('id-ID', {
+                timeZone: 'Asia/Jakarta',
+                day:    '2-digit',
+                month:  'short',
+                year:   'numeric',
+                hour:   '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        } catch { return isoStr; }
+    }
+
+    // ============================================================
+    // LOAD HISTORY
+    // ============================================================
+
+    async function loadHistory(page = 1) {
+        if (isLoading) return;
+        isLoading = true;
+
+        // Spinner on refresh button
+        const icon = document.getElementById('refreshIcon');
+        icon.classList.add('animate-spin');
+
+        // Show loading state inside table
+        const tbody = document.getElementById('historyTableBody');
+        tbody.innerHTML = `
+            <tr id="loadingRow">
+                <td colspan="6" class="text-center py-14">
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        <p class="text-sm text-slate-500">Memuat data riwayat…</p>
+                    </div>
+                </td>
+            </tr>`;
+
+        // Build query string
+        const params = new URLSearchParams({ page });
+        if (currentStatus)   params.set('status',    currentStatus);
+        if (currentDateFrom) params.set('date_from', currentDateFrom);
+        if (currentDateTo)   params.set('date_to',   currentDateTo);
+
+        try {
+            const res  = await fetch(`/get_history?${params}`);
+            const json = await res.json();
+
+            if (!res.ok || json.error) {
+                showDbError(json.error || `HTTP ${res.status}`);
+                renderEmpty('Gagal memuat data dari database.');
+                return;
+            }
+
+            hideDbError();
+            renderTable(json);
+            renderPagination(json);
+            currentPage = json.page;
+
+            document.getElementById('recordCount').textContent =
+                `${json.total.toLocaleString('id-ID')} catatan`;
+
+        } catch (err) {
+            showDbError(err.message);
+            renderEmpty('Tidak dapat terhubung ke server Flask.');
+        } finally {
+            isLoading = false;
+            icon.classList.remove('animate-spin');
+        }
+    }
+
+    // ============================================================
+    // RENDER TABLE ROWS
+    // ============================================================
+
+    function renderTable(json) {
+        const tbody = document.getElementById('historyTableBody');
+
+        if (!json.data || json.data.length === 0) {
+            renderEmpty(
+                currentStatus || currentDateFrom || currentDateTo
+                    ? 'Tidak ada data yang cocok dengan filter yang dipilih.'
+                    : 'Belum ada data riwayat monitoring. Mulai sesi monitoring untuk merekam data.'
+            );
+            return;
+        }
+
+        const rows = json.data.map((row, i) => {
+            const ear   = row.ear   != null ? Number(row.ear).toFixed(3)   : '—';
+            const mar   = row.mar   != null ? Number(row.mar).toFixed(3)   : '—';
+            const pitch = row.pitch != null ? Number(row.pitch).toFixed(1) + '°' : '—';
+            const yaw   = row.yaw   != null ? Number(row.yaw).toFixed(1)   + '°' : '—';
+
+            const rowBg = i % 2 === 0 ? '' : 'bg-slate-900/30';
+
+            return `
+            <tr class="border-b border-slate-800/40 hover:bg-slate-800/40 transition-colors ${rowBg}">
+                <td class="px-5 py-3 text-slate-400 font-mono whitespace-nowrap">
+                    ${formatTimestamp(row.created_at)}
+                </td>
+                <td class="px-4 py-3">
+                    ${statusBadge(row.status)}
+                </td>
+                <td class="px-4 py-3 text-right font-mono ${earColor(row.ear)}">
+                    ${ear}
+                </td>
+                <td class="px-4 py-3 text-right font-mono ${marColor(row.mar)}">
+                    ${mar}
+                </td>
+                <td class="px-4 py-3 text-right font-mono ${headPoseColor(row.pitch)}">
+                    ${pitch}
+                </td>
+                <td class="px-5 py-3 text-right font-mono ${headPoseColor(row.yaw)}">
+                    ${yaw}
+                </td>
+            </tr>`;
+        }).join('');
+
+        tbody.innerHTML = rows;
+    }
+
+    function renderEmpty(message) {
+        const tbody = document.getElementById('historyTableBody');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-16 px-5">
+                    <div class="max-w-xs mx-auto">
+                        <div class="w-14 h-14 rounded-2xl bg-slate-800/60 border border-slate-700/40 flex items-center justify-center mx-auto mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-600"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+                        </div>
+                        <p class="text-sm font-semibold text-slate-400 mb-2">Tidak Ada Data</p>
+                        <p class="text-xs text-slate-500 leading-relaxed mb-4">${message}</p>
+                        <a href="/monitoring"
+                           class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-colors">
+                            Mulai Monitoring
+                        </a>
+                    </div>
+                </td>
+            </tr>`;
+    }
+
+    // ============================================================
+    // RENDER PAGINATION
+    // ============================================================
+
+    function renderPagination(json) {
+        const { page, pages, total, page_size } = json;
+
+        const start = total === 0 ? 0 : (page - 1) * page_size + 1;
+        const end   = Math.min(page * page_size, total);
+
+        document.getElementById('paginationInfo').textContent =
+            total > 0
+                ? `Menampilkan ${start}–${end} dari ${total.toLocaleString('id-ID')} catatan`
+                : 'Tidak ada catatan';
+
+        const container = document.getElementById('paginationBtns');
+
+        if (pages <= 1) { container.innerHTML = ''; return; }
+
+        // Build page buttons (show max 5 around current)
+        let btns = '';
+
+        // Prev
+        btns += `<button onclick="loadHistory(${page - 1})" ${page === 1 ? 'disabled' : ''}
+                         class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors
+                                ${page === 1
+                                    ? 'bg-slate-900 text-slate-700 border-slate-800 cursor-not-allowed'
+                                    : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 active:scale-95'}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                 </button>`;
+
+        // Page numbers
+        const rangeStart = Math.max(1, page - 2);
+        const rangeEnd   = Math.min(pages, page + 2);
+
+        if (rangeStart > 1) btns += pageBtn(1, page) + (rangeStart > 2 ? `<span class="px-1 text-slate-600 text-xs">…</span>` : '');
+        for (let p = rangeStart; p <= rangeEnd; p++) btns += pageBtn(p, page);
+        if (rangeEnd < pages) btns += (rangeEnd < pages - 1 ? `<span class="px-1 text-slate-600 text-xs">…</span>` : '') + pageBtn(pages, page);
+
+        // Next
+        btns += `<button onclick="loadHistory(${page + 1})" ${page === pages ? 'disabled' : ''}
+                         class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors
+                                ${page === pages
+                                    ? 'bg-slate-900 text-slate-700 border-slate-800 cursor-not-allowed'
+                                    : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 active:scale-95'}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                 </button>`;
+
+        container.innerHTML = btns;
+    }
+
+    function pageBtn(p, current) {
+        const active = p === current;
+        return `<button onclick="loadHistory(${p})"
+                        class="px-2.5 py-1 rounded-lg text-xs font-semibold border transition-colors active:scale-95
+                               ${active
+                                   ? 'bg-blue-600 text-white border-blue-500'
+                                   : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'}">
+                    ${p}
+                </button>`;
+    }
+
+    // ============================================================
+    // LOAD STATS
+    // ============================================================
+
+    async function loadStats() {
+        try {
+            const res  = await fetch('/get_history_stats');
+            const json = await res.json();
+
+            if (json.error) return;
+
+            document.getElementById('statTotal').textContent =
+                json.total.toLocaleString('id-ID');
+            document.getElementById('statDrowsy').textContent =
+                json.drowsy.toLocaleString('id-ID');
+            document.getElementById('statDistracted').textContent =
+                json.distracted.toLocaleString('id-ID');
+            document.getElementById('statAlert').textContent =
+                json.alert.toLocaleString('id-ID');
+
+            // Update DB status badge to connected
+            setDbBadge(true);
+
+        } catch (err) {
+            setDbBadge(false);
+        }
+    }
+
+    // ============================================================
+    // DB STATUS BADGE
+    // ============================================================
+
+    function setDbBadge(ok) {
+        const badge = document.getElementById('dbStatusBadge');
+        if (ok) {
+            badge.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/10 border border-emerald-500/30 text-xs font-medium text-emerald-400';
+            badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Database Terhubung`;
+        } else {
+            badge.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-600/10 border border-rose-500/30 text-xs font-medium text-rose-400';
+            badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Database Offline`;
+        }
+    }
+
+    function showDbError(msg) {
+        setDbBadge(false);
+        const notice = document.getElementById('dbErrorNotice');
+        const msgEl  = document.getElementById('dbErrorMsg');
+        notice.classList.remove('hidden');
+        if (msg) msgEl.textContent = 'Error: ' + msg;
+        document.getElementById('recordCount').textContent = 'Error';
+    }
+
+    function hideDbError() {
+        document.getElementById('dbErrorNotice').classList.add('hidden');
+        setDbBadge(true);
+    }
+
+    // ============================================================
+    // FILTER
+    // ============================================================
+
+    function applyFilter() {
+        currentStatus   = document.getElementById('filterStatus').value;
+        currentDateFrom = document.getElementById('filterDateFrom').value;
+        currentDateTo   = document.getElementById('filterDateTo').value;
+        currentPage = 1;
+        loadHistory(1);
+    }
+
+    function resetFilter() {
+        document.getElementById('filterStatus').value   = '';
+        document.getElementById('filterDateFrom').value = '';
+        document.getElementById('filterDateTo').value   = '';
+        currentStatus   = '';
+        currentDateFrom = '';
+        currentDateTo   = '';
+        currentPage = 1;
+        loadHistory(1);
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+
+    loadStats();
+    loadHistory(1);
+
+    // Auto-refresh setiap 30 detik jika halaman terbuka
+    setInterval(() => {
+        loadStats();
+        if (currentPage === 1) loadHistory(1);
+    }, 30000);
+
+</script>
+{% endblock %}

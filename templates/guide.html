@@ -1,0 +1,556 @@
+{% extends "base.html" %}
+{% set active_page = "guide" %}
+
+{% block title %}Panduan Penggunaan — DrowsiGuard{% endblock %}
+
+{% block content %}
+
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Page Header -->
+    <div class="mb-10 text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-600/15 border border-blue-500/30 text-blue-400 text-xs font-semibold mb-4">
+            <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+            Dokumentasi Lengkap
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-white mb-3">
+            Panduan Penggunaan DrowsiGuard
+        </h1>
+        <p class="text-slate-400 text-sm max-w-xl mx-auto leading-relaxed">
+            Pelajari cara kerja sistem, arti setiap status, tips konfigurasi kamera,
+            dan panduan penggunaan alarm untuk hasil deteksi yang optimal.
+        </p>
+    </div>
+
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 mb-8">
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Daftar Isi</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+            <a href="#status" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs transition-colors group">
+                <i data-lucide="activity" class="w-3.5 h-3.5 text-blue-400"></i>
+                1. Arti Status Monitoring
+            </a>
+            <a href="#camera" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs transition-colors group">
+                <i data-lucide="camera" class="w-3.5 h-3.5 text-blue-400"></i>
+                2. Panduan Posisi Kamera
+            </a>
+            <a href="#lighting" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs transition-colors group">
+                <i data-lucide="sun" class="w-3.5 h-3.5 text-blue-400"></i>
+                3. Tips Pencahayaan
+            </a>
+            <a href="#alarm" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs transition-colors group">
+                <i data-lucide="bell-ring" class="w-3.5 h-3.5 text-blue-400"></i>
+                4. Panduan Alarm
+            </a>
+            <a href="#metrics" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs transition-colors group">
+                <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-blue-400"></i>
+                5. Memahami Metrik
+            </a>
+            <a href="#disclaimer" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs transition-colors group">
+                <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-amber-400"></i>
+                6. Disclaimer Keselamatan
+            </a>
+        </div>
+    </div>
+
+
+    <!-- ============================================ -->
+    <!-- SECTION 1: STATUS                            -->
+    <!-- ============================================ -->
+    <section id="status" class="mb-10 scroll-mt-20">
+        <h2 class="text-lg font-bold text-white mb-5 flex items-center gap-2 pb-3 border-b border-slate-800">
+            <div class="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center">
+                <i data-lucide="activity" class="w-4 h-4 text-blue-400"></i>
+            </div>
+            1. Arti Status Monitoring
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <!-- ALERT -->
+            <div class="relative overflow-hidden bg-emerald-600/8 border border-emerald-500/25 rounded-2xl p-5">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl -translate-y-8 translate-x-8"></div>
+                <div class="relative">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+                        </div>
+                        <div>
+                            <span class="inline-block px-2 py-0.5 rounded-md bg-emerald-600/20 text-emerald-400 text-xs font-black tracking-wider border border-emerald-500/30">
+                                ALERT
+                            </span>
+                            <p class="text-[10px] text-slate-500 mt-0.5">Status Normal — Fokus</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Pengemudi dalam kondisi fokus dan waspada. EAR di atas ambang normal (>0.22),
+                        mulut tidak terbuka lebar, dan kepala menghadap ke depan (Pitch & Yaw dalam rentang ±15°).
+                        Model Random Forest mengklasifikasikan kondisi ini sebagai <strong class="text-emerald-400">aman</strong>.
+                    </p>
+                    <div class="mt-3 flex flex-wrap gap-1.5">
+                        <span class="px-2 py-0.5 rounded bg-emerald-600/10 text-emerald-500 text-[10px] font-medium">EAR &gt; 0.22</span>
+                        <span class="px-2 py-0.5 rounded bg-emerald-600/10 text-emerald-500 text-[10px] font-medium">MAR &lt; 0.35</span>
+                        <span class="px-2 py-0.5 rounded bg-emerald-600/10 text-emerald-500 text-[10px] font-medium">Pitch & Yaw ±15°</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KANTUK -->
+            <div class="relative overflow-hidden bg-rose-600/8 border border-rose-500/25 rounded-2xl p-5">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-rose-500/5 rounded-full blur-2xl -translate-y-8 translate-x-8"></div>
+                <div class="relative">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-9 h-9 rounded-xl bg-rose-600/20 border border-rose-500/30 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="eye-off" class="w-4 h-4 text-rose-400"></i>
+                        </div>
+                        <div>
+                            <span class="inline-block px-2 py-0.5 rounded-md bg-rose-600/20 text-rose-400 text-xs font-black tracking-wider border border-rose-500/30">
+                                KANTUK
+                            </span>
+                            <p class="text-[10px] text-slate-500 mt-0.5">Berbahaya — Alarm Berbunyi</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Terdeteksi gejala kantuk. Mata menyipit (<strong class="text-rose-400">EAR ≤ 0.22</strong>)
+                        atau pengemudi menguap (<strong class="text-rose-400">MAR ≥ 0.35</strong>).
+                        Alarm sirine cepat akan berbunyi. Segera <strong class="text-rose-300">berhenti di tempat aman</strong>
+                        dan beristirahat.
+                    </p>
+                    <div class="mt-3 flex flex-wrap gap-1.5">
+                        <span class="px-2 py-0.5 rounded bg-rose-600/10 text-rose-500 text-[10px] font-medium">EAR ≤ 0.22</span>
+                        <span class="px-2 py-0.5 rounded bg-rose-600/10 text-rose-500 text-[10px] font-medium">MAR ≥ 0.35</span>
+                        <span class="px-2 py-0.5 rounded bg-rose-600/10 text-rose-500 text-[10px] font-medium">🔊 Alarm Sirine</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DISTRACTED -->
+            <div class="relative overflow-hidden bg-amber-600/8 border border-amber-500/25 rounded-2xl p-5">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl -translate-y-8 translate-x-8"></div>
+                <div class="relative">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-9 h-9 rounded-xl bg-amber-600/20 border border-amber-500/30 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="scan-face" class="w-4 h-4 text-amber-400"></i>
+                        </div>
+                        <div>
+                            <span class="inline-block px-2 py-0.5 rounded-md bg-amber-600/20 text-amber-400 text-xs font-black tracking-wider border border-amber-500/30">
+                                DISTRACTED
+                            </span>
+                            <p class="text-[10px] text-slate-500 mt-0.5">Peringatan — Kepala Menyimpang</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Kepala pengemudi tidak menghadap ke depan. Sudut Pitch atau Yaw melebihi
+                        <strong class="text-amber-400">±15°</strong>. Mungkin pengemudi melihat ke samping,
+                        menunduk, atau mendongak. Alarm peringatan lembut akan berbunyi.
+                    </p>
+                    <div class="mt-3 flex flex-wrap gap-1.5">
+                        <span class="px-2 py-0.5 rounded bg-amber-600/10 text-amber-500 text-[10px] font-medium">|Pitch| &gt; 15°</span>
+                        <span class="px-2 py-0.5 rounded bg-amber-600/10 text-amber-500 text-[10px] font-medium">|Yaw| &gt; 15°</span>
+                        <span class="px-2 py-0.5 rounded bg-amber-600/10 text-amber-500 text-[10px] font-medium">🔔 Alarm Lembut</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NO FACE -->
+            <div class="relative overflow-hidden bg-slate-700/20 border border-slate-600/30 rounded-2xl p-5">
+                <div class="relative">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-9 h-9 rounded-xl bg-slate-700/60 border border-slate-600/50 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="user-x" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+                        <div>
+                            <span class="inline-block px-2 py-0.5 rounded-md bg-slate-700/60 text-slate-300 text-xs font-black tracking-wider border border-slate-600/50">
+                                NO FACE
+                            </span>
+                            <p class="text-[10px] text-slate-500 mt-0.5">Wajah Tidak Terdeteksi</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        MediaPipe tidak dapat mendeteksi wajah dalam frame. Bisa disebabkan oleh
+                        pencahayaan terlalu gelap, wajah terlalu jauh, sudut kamera salah,
+                        atau obyek menghalangi kamera. Pastikan wajah terlihat jelas.
+                    </p>
+                    <div class="mt-3 flex flex-wrap gap-1.5">
+                        <span class="px-2 py-0.5 rounded bg-slate-700/40 text-slate-500 text-[10px] font-medium">Tanpa Alarm</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-700/40 text-slate-500 text-[10px] font-medium">Periksa Kamera</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ============================================ -->
+    <!-- SECTION 2: CAMERA POSITION                   -->
+    <!-- ============================================ -->
+    <section id="camera" class="mb-10 scroll-mt-20">
+        <h2 class="text-lg font-bold text-white mb-5 flex items-center gap-2 pb-3 border-b border-slate-800">
+            <div class="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center">
+                <i data-lucide="camera" class="w-4 h-4 text-blue-400"></i>
+            </div>
+            2. Panduan Posisi Kamera
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition-colors">
+                <div class="w-9 h-9 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center mb-3">
+                    <i data-lucide="ruler" class="w-4 h-4 text-blue-400"></i>
+                </div>
+                <h3 class="text-sm font-bold text-white mb-2">Jarak Ideal</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Posisikan kamera pada jarak <strong class="text-blue-300">50–80 cm</strong> dari wajah.
+                    Terlalu jauh membuat landmark wajah tidak akurat; terlalu dekat memotong bagian wajah.
+                </p>
+                <div class="mt-3 p-2.5 rounded-lg bg-blue-600/8 border border-blue-500/15">
+                    <p class="text-[10px] text-blue-400 font-medium">✓ Optimal: 60 cm</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition-colors">
+                <div class="w-9 h-9 rounded-xl bg-emerald-600/15 border border-emerald-500/30 flex items-center justify-center mb-3">
+                    <i data-lucide="move-vertical" class="w-4 h-4 text-emerald-400"></i>
+                </div>
+                <h3 class="text-sm font-bold text-white mb-2">Ketinggian Kamera</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Pastikan kamera setara dengan <strong class="text-emerald-300">tinggi mata</strong> atau
+                    sedikit di bawahnya. Kamera yang terlalu tinggi atau rendah
+                    menyebabkan kesalahan estimasi sudut Pitch.
+                </p>
+                <div class="mt-3 p-2.5 rounded-lg bg-emerald-600/8 border border-emerald-500/15">
+                    <p class="text-[10px] text-emerald-400 font-medium">✓ Setara tinggi mata</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition-colors">
+                <div class="w-9 h-9 rounded-xl bg-indigo-600/15 border border-indigo-500/30 flex items-center justify-center mb-3">
+                    <i data-lucide="crosshair" class="w-4 h-4 text-indigo-400"></i>
+                </div>
+                <h3 class="text-sm font-bold text-white mb-2">Sudut Kamera</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Arahkan kamera <strong class="text-indigo-300">langsung ke depan</strong>, bukan dari samping.
+                    Sudut kamera yang miring akan membiaskan nilai Yaw dan menyebabkan deteksi
+                    distraksi yang tidak akurat.
+                </p>
+                <div class="mt-3 p-2.5 rounded-lg bg-indigo-600/8 border border-indigo-500/15">
+                    <p class="text-[10px] text-indigo-400 font-medium">✓ Lurus menghadap wajah</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ============================================ -->
+    <!-- SECTION 3: LIGHTING                          -->
+    <!-- ============================================ -->
+    <section id="lighting" class="mb-10 scroll-mt-20">
+        <h2 class="text-lg font-bold text-white mb-5 flex items-center gap-2 pb-3 border-b border-slate-800">
+            <div class="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center">
+                <i data-lucide="sun" class="w-4 h-4 text-blue-400"></i>
+            </div>
+            3. Tips Pencahayaan
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <!-- Do's -->
+            <div class="bg-emerald-600/5 border border-emerald-500/20 rounded-xl p-5">
+                <h3 class="text-sm font-bold text-emerald-400 mb-4 flex items-center gap-2">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                    Yang Disarankan
+                </h3>
+                <ul class="space-y-2.5">
+                    <li class="flex items-start gap-2 text-xs text-slate-400">
+                        <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 mt-0.5"></i>
+                        <span>Gunakan <strong class="text-slate-300">pencahayaan merata</strong> dari depan wajah — hindari backlight (sumber cahaya di belakang).</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-xs text-slate-400">
+                        <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 mt-0.5"></i>
+                        <span>Cahaya alami siang hari sangat ideal. Jika malam, gunakan lampu kabin atau lampu tambahan di dashboard.</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-xs text-slate-400">
+                        <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 mt-0.5"></i>
+                        <span>Cahaya putih/netral (6500K) memberikan hasil terbaik untuk deteksi landmark wajah MediaPipe.</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-xs text-slate-400">
+                        <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 mt-0.5"></i>
+                        <span>Pastikan kedua mata terlihat jelas dan tidak terlalu silau.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Don'ts -->
+            <div class="bg-rose-600/5 border border-rose-500/20 rounded-xl p-5">
+                <h3 class="text-sm font-bold text-rose-400 mb-4 flex items-center gap-2">
+                    <i data-lucide="x-circle" class="w-4 h-4"></i>
+                    Yang Harus Dihindari
+                </h3>
+                <ul class="space-y-2.5">
+                    <li class="flex items-start gap-2 text-xs text-slate-400">
+                        <i data-lucide="x" class="w-3.5 h-3.5 text-rose-400 flex-shrink-0 mt-0.5"></i>
+                        <span>Jangan menempatkan sumber cahaya terang <strong class="text-slate-300">di belakang kepala</strong> (silhouette membuat wajah gelap).</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-xs text-slate-400">
+                        <i data-lucide="x" class="w-3.5 h-3.5 text-rose-400 flex-shrink-0 mt-0.5"></i>
+                        <span>Hindari kacamata hitam atau kacamata cermin yang menutupi mata dan menghalangi deteksi EAR.</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-xs text-slate-400">
+                        <i data-lucide="x" class="w-3.5 h-3.5 text-rose-400 flex-shrink-0 mt-0.5"></i>
+                        <span>Cahaya yang terlalu redup menyebabkan status <span class="text-slate-300 font-medium">NO FACE</span> terus menerus.</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-xs text-slate-400">
+                        <i data-lucide="x" class="w-3.5 h-3.5 text-rose-400 flex-shrink-0 mt-0.5"></i>
+                        <span>Cahaya berkedip (misalnya lampu neon rusak) dapat menyebabkan deteksi yang tidak stabil.</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ============================================ -->
+    <!-- SECTION 4: ALARM                             -->
+    <!-- ============================================ -->
+    <section id="alarm" class="mb-10 scroll-mt-20">
+        <h2 class="text-lg font-bold text-white mb-5 flex items-center gap-2 pb-3 border-b border-slate-800">
+            <div class="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center">
+                <i data-lucide="bell-ring" class="w-4 h-4 text-blue-400"></i>
+            </div>
+            4. Panduan Alarm
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+
+            <!-- Drowsy alarm -->
+            <div class="bg-rose-600/8 border border-rose-500/25 rounded-xl p-5">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-9 h-9 rounded-xl bg-rose-600/20 flex items-center justify-center">
+                        <i data-lucide="siren" class="w-4 h-4 text-rose-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-rose-300">Alarm Kantuk</h3>
+                        <p class="text-[10px] text-slate-500">Sirine Cepat Nada Tinggi-Rendah</p>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed mb-3">
+                    Berbunyi saat status <strong class="text-rose-400">KANTUK</strong> terdeteksi.
+                    Suara sirine berulang cepat bergantian antara nada 960Hz dan 700Hz dengan gelombang square.
+                    Dirancang untuk mengejutkan dan membangunkan pengemudi yang mengantuk.
+                </p>
+                <div class="bg-rose-600/10 rounded-lg p-2.5 text-[10px] text-rose-400 font-medium">
+                    🔊 960Hz / 700Hz · Square Wave · 170ms interval
+                </div>
+            </div>
+
+            <!-- Distracted alarm -->
+            <div class="bg-amber-600/8 border border-amber-500/25 rounded-xl p-5">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-9 h-9 rounded-xl bg-amber-600/20 flex items-center justify-center">
+                        <i data-lucide="bell" class="w-4 h-4 text-amber-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-amber-300">Alarm Distraksi</h3>
+                        <p class="text-[10px] text-slate-500">Dua Nada Lembut Berselang</p>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed mb-3">
+                    Berbunyi saat status <strong class="text-amber-400">DISTRACTED</strong> terdeteksi.
+                    Dua beep lembut (520Hz lalu 430Hz) dengan gelombang sine, berulang setiap 1,3 detik.
+                    Lebih halus untuk mengingatkan tanpa mengejutkan saat kondisi tidak darurat.
+                </p>
+                <div class="bg-amber-600/10 rounded-lg p-2.5 text-[10px] text-amber-400 font-medium">
+                    🔔 520Hz → 430Hz · Sine Wave · 1.3s interval
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Alarm Tips -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5">
+            <h3 class="text-xs font-bold text-slate-300 mb-3 flex items-center gap-2">
+                <i data-lucide="info" class="w-3.5 h-3.5 text-blue-400"></i>
+                Tips Penggunaan Alarm
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="text-xs text-slate-400 flex items-start gap-2">
+                    <i data-lucide="volume-2" class="w-3.5 h-3.5 text-blue-400 flex-shrink-0 mt-0.5"></i>
+                    <span>Pastikan volume speaker atau headphone cukup keras agar alarm terdengar meski jendela terbuka.</span>
+                </div>
+                <div class="text-xs text-slate-400 flex items-start gap-2">
+                    <i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5 text-blue-400 flex-shrink-0 mt-0.5"></i>
+                    <span>Klik tombol "Mulai Pemantauan" sekali agar browser mengizinkan audio — ini diperlukan oleh kebijakan browser modern.</span>
+                </div>
+                <div class="text-xs text-slate-400 flex items-start gap-2">
+                    <i data-lucide="wifi-off" class="w-3.5 h-3.5 text-blue-400 flex-shrink-0 mt-0.5"></i>
+                    <span>Alarm dihasilkan langsung oleh browser (Web Audio API) tanpa koneksi internet — bekerja sepenuhnya secara lokal.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================ -->
+    <!-- SECTION 5: METRICS                           -->
+    <!-- ============================================ -->
+    <section id="metrics" class="mb-10 scroll-mt-20">
+        <h2 class="text-lg font-bold text-white mb-5 flex items-center gap-2 pb-3 border-b border-slate-800">
+            <div class="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center">
+                <i data-lucide="bar-chart-2" class="w-4 h-4 text-blue-400"></i>
+            </div>
+            5. Memahami Metrik
+        </h2>
+
+        <div class="space-y-3">
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-slate-700 transition-colors">
+                <div class="sm:w-32 flex-shrink-0">
+                    <span class="inline-block px-2 py-0.5 rounded-md bg-blue-600/20 text-blue-400 text-xs font-black border border-blue-500/30">EAR</span>
+                    <p class="text-[10px] text-slate-500 mt-1">Eye Aspect Ratio</p>
+                    <p class="text-[10px] text-slate-600 mt-0.5">Rentang: 0.00 – 0.50</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Rasio aspek mata — mengukur seberapa terbuka mata. Dihitung dari 6 titik landmark MediaPipe di setiap mata.
+                        Nilai <strong class="text-slate-300">tinggi (~0.3+)</strong> berarti mata terbuka lebar (waspada).
+                        Nilai <strong class="text-rose-400">rendah (≤ 0.22)</strong> berarti mata menyipit atau tertutup (kantuk).
+                        Nilai rata-rata dari mata kiri dan kanan digunakan.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-slate-700 transition-colors">
+                <div class="sm:w-32 flex-shrink-0">
+                    <span class="inline-block px-2 py-0.5 rounded-md bg-indigo-600/20 text-indigo-400 text-xs font-black border border-indigo-500/30">MAR</span>
+                    <p class="text-[10px] text-slate-500 mt-1">Mouth Aspect Ratio</p>
+                    <p class="text-[10px] text-slate-600 mt-0.5">Rentang: 0.00 – 0.80</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Rasio aspek mulut — mengukur seberapa terbuka mulut. Dihitung dari 8 titik landmark di sekitar bibir.
+                        Nilai normal saat mulut tertutup adalah <strong class="text-slate-300">~0.1–0.2</strong>.
+                        Nilai <strong class="text-rose-400">≥ 0.35</strong> menunjukkan mulut terbuka lebar (menguap) yang merupakan indikator kuat kantuk.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-slate-700 transition-colors">
+                <div class="sm:w-32 flex-shrink-0">
+                    <span class="inline-block px-2 py-0.5 rounded-md bg-amber-600/20 text-amber-400 text-xs font-black border border-amber-500/30">PITCH</span>
+                    <p class="text-[10px] text-slate-500 mt-1">Rotasi Atas/Bawah</p>
+                    <p class="text-[10px] text-slate-600 mt-0.5">Satuan: Derajat (°)</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Sudut kemiringan kepala sumbu X — naik/turun. Nilai <strong class="text-slate-300">positif</strong> berarti kepala mendongak,
+                        <strong class="text-slate-300">negatif</strong> berarti kepala menunduk.
+                        Jika <strong class="text-amber-400">|Pitch| > 15°</strong>, sistem akan menganggap pengemudi terdistraksi
+                        (misalnya melihat ke ponsel di bawah atau spion di atas).
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-slate-700 transition-colors">
+                <div class="sm:w-32 flex-shrink-0">
+                    <span class="inline-block px-2 py-0.5 rounded-md bg-teal-600/20 text-teal-400 text-xs font-black border border-teal-500/30">YAW</span>
+                    <p class="text-[10px] text-slate-500 mt-1">Rotasi Kiri/Kanan</p>
+                    <p class="text-[10px] text-slate-600 mt-0.5">Satuan: Derajat (°)</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Sudut rotasi kepala sumbu Y — kiri/kanan. Nilai <strong class="text-slate-300">positif</strong> berarti kepala berpaling ke kanan,
+                        <strong class="text-slate-300">negatif</strong> berarti ke kiri.
+                        Jika <strong class="text-amber-400">|Yaw| > 15°</strong>, pengemudi dianggap melihat ke samping
+                        dan sistem akan memperingatkan distraksi.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ============================================ -->
+    <!-- SECTION 6: DISCLAIMER                        -->
+    <!-- ============================================ -->
+    <section id="disclaimer" class="mb-10 scroll-mt-20">
+        <h2 class="text-lg font-bold text-white mb-5 flex items-center gap-2 pb-3 border-b border-slate-800">
+            <div class="w-7 h-7 rounded-lg bg-amber-600/20 flex items-center justify-center">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400"></i>
+            </div>
+            6. Disclaimer Keselamatan
+        </h2>
+
+        <div class="relative overflow-hidden bg-amber-600/8 border border-amber-500/25 rounded-2xl p-6">
+            <div class="absolute inset-0 pointer-events-none">
+                <div class="absolute right-4 top-4 opacity-5">
+                    <i data-lucide="shield-alert" class="w-24 h-24 text-amber-400"></i>
+                </div>
+            </div>
+            <div class="relative space-y-4">
+
+                <div class="flex items-start gap-3">
+                    <div class="w-7 h-7 rounded-lg bg-amber-600/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <i data-lucide="triangle-alert" class="w-3.5 h-3.5 text-amber-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-amber-300 mb-1.5">Alat Bantu, Bukan Pengganti Kewaspadaan</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            DrowsiGuard adalah sistem deteksi berbasis kamera yang dapat mengalami keterbatasan dan kesalahan.
+                            Sistem ini <strong class="text-slate-300">tidak menjamin 100% akurasi</strong> dalam segala kondisi.
+                            Faktor seperti pencahayaan buruk, sudut kamera yang tidak ideal, kacamata, atau kondisi wajah tertentu
+                            dapat mempengaruhi hasil deteksi.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3">
+                    <div class="w-7 h-7 rounded-lg bg-rose-600/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <i data-lucide="car" class="w-3.5 h-3.5 text-rose-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-rose-300 mb-1.5">Jika Merasa Mengantuk — Langsung Berhenti</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            <strong class="text-rose-300">Segera pinggirkan kendaraan di tempat aman</strong>, matikan mesin,
+                            dan beristirahat minimal 15–20 menit. Jangan tunggu alarm — percayai insting Anda.
+                            Jika mengemudi dalam kondisi sangat mengantuk, mintalah penumpang lain yang fit untuk menggantikan.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3">
+                    <div class="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <i data-lucide="scale" class="w-3.5 h-3.5 text-blue-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-blue-300 mb-1.5">Tanggung Jawab Pengemudi</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Pengemudi tetap bertanggung jawab penuh atas keselamatan berkendara.
+                            Penggunaan sistem ini tidak mengurangi kewajiban hukum dan moral pengemudi
+                            untuk selalu berkendara dalam kondisi prima dan mematuhi peraturan lalu lintas.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Back to Monitoring CTA -->
+    <div class="text-center py-6">
+        <a href="/monitoring"
+           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition-all shadow-lg shadow-blue-600/20 active:scale-95">
+            <i data-lucide="play-circle" class="w-4 h-4"></i>
+            Mulai Monitoring Sekarang
+        </a>
+        <p class="text-xs text-slate-500 mt-3">Sudah memahami panduan? Aktifkan sistem pemantauan.</p>
+    </div>
+
+</div>
+
+{% endblock %}
